@@ -14,8 +14,8 @@ State::~State(){};
  * to determine if the transition occurs
  * state is the state to transition to
  */
-void State::addTransition(bool (*conditionFunction)(), State* s){
-  struct Transition* t = new Transition{conditionFunction,s->index};
+void State::addTransition(std::function<bool()> conditionFunction, State* s){
+  struct Transition* t = new Transition{conditionFunction, s->index};
   transitions->add(t);
 }
 
@@ -27,8 +27,8 @@ void State::addTransition(bool (*conditionFunction)(), State* s){
  * to determine if the transition occurs
  * stateNumber is the number of the state to transition to
  */
-void State::addTransition(bool (*conditionFunction)(), int stateNumber){
-  struct Transition* t = new Transition{conditionFunction,stateNumber};
+void State::addTransition(std::function<bool()> conditionFunction, int stateNumber){
+  struct Transition* t = new Transition{conditionFunction, stateNumber};
   transitions->add(t);
 }
 

@@ -10,7 +10,7 @@
  * from the current state and the number of the state to transition to
  */
 struct Transition{
-  bool (*conditionFunction)();
+  std::function<bool()> conditionFunction;
   int stateNumber;
 };
 
@@ -25,8 +25,8 @@ class State{
     State();
     ~State();
 
-	void addTransition(bool (*c)(), State* s);
-    void addTransition(bool (*c)(), int stateNumber);
+	void addTransition(std::function<bool()> c, State* s);
+    void addTransition(std::function<bool()> c, int stateNumber);
     int evalTransitions();
     int execute();
     int setTransition(int index, int stateNumber);	//Can now dynamically set the transition
