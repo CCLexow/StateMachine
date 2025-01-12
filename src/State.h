@@ -2,6 +2,7 @@
 
 #ifndef _STATE_H
 #define _STATE_H
+#include <functional>
 
 /*
  * Transition is a structure that holds the address of 
@@ -32,7 +33,8 @@ class State{
 	
     // stateLogic is the pointer to the function
     // that represents the state logic
-    void (*stateLogic)();
+    // void (*stateLogic)();
+    std::function<void()> stateLogic;
     LinkedList<struct Transition*> *transitions;
 	int index;
 };

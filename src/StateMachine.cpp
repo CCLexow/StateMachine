@@ -47,6 +47,14 @@ State* StateMachine::addState(void(*functionPointer)()){
   return s;
 }
 
+State* StateMachine::addState(std::function<void(void)> stateFunction) {
+  State* s = new State();
+  s->stateLogic = [stateFunction]() { stateFunction(); };
+  stateList->add(s);
+  s->index = stateList->size() - 1;
+  return s;
+}
+
 /*
  * Jump to a state
  * given by a pointer to that state.

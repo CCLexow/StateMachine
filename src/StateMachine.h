@@ -1,5 +1,6 @@
 #include <LinkedList.h>
 #include "State.h"
+#include <functional>
 
 #ifndef _STATEMACHINE_H
 #define _STATEMACHINE_H
@@ -16,13 +17,15 @@ class StateMachine
 
     // When a stated is added we pass the function that represents 
     // that state logic
+    State* addState(std::function<void(void)> stateFunction);
     State* addState(void (*functionPointer)());
+
     State* transitionTo(State* s);
     int transitionTo(int i);
 	
     // Attributes
     LinkedList<State*> *stateList;
-	  bool executeOnce = true; 	//Indicates that a transition to a different state has occurred
+    bool executeOnce = true; 	//Indicates that a transition to a different state has occurred
     int currentState = -1;	//Indicates the current state number
 };
 
