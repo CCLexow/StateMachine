@@ -1,4 +1,4 @@
-#include <LinkedList.h>
+#include <list> // Add this line
 
 #ifndef _STATE_H
 #define _STATE_H
@@ -25,21 +25,17 @@ class State{
     State();
     ~State();
 
-	void addTransition(std::function<bool()> c, State* s);
+    void addTransition(std::function<bool()> c, State* s);
     void addTransition(std::function<bool()> c, int stateNumber);
     int evalTransitions();
     int execute();
     int setTransition(int index, int stateNumber);	//Can now dynamically set the transition
-	
+    
     // stateLogic is the pointer to the function
     // that represents the state logic
-    // void (*stateLogic)();
     std::function<void()> stateLogic;
-    LinkedList<struct Transition*> *transitions;
-	int index;
+    std::list<struct Transition*> transitions; // Change LinkedList to std::list
+    int index;
 };
-
-
-
 
 #endif

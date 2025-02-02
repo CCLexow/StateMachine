@@ -1,4 +1,4 @@
-#include <LinkedList.h>
+#include <list> // Add this line
 #include "State.h"
 #include <functional>
 
@@ -22,13 +22,11 @@ class StateMachine
 
     State* transitionTo(State* s);
     int transitionTo(int i);
-	
+    
     // Attributes
-    LinkedList<State*> *stateList;
+    std::list<State*> stateList; // Change LinkedList to std::list
     bool executeOnce = true; 	//Indicates that a transition to a different state has occurred
     int currentState = -1;	//Indicates the current state number
 };
-
-
 
 #endif

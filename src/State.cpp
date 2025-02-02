@@ -1,71 +1,67 @@
 #include "State.h"
+// #include <Arduino.h> // Add this line for Serial
 
 State::State(){
-  transitions = new LinkedList<struct Transition*>();
-};
+  // No need to initialize transitions as std::list initializes itself
+  // Serial.print("State created with index ");
+  // Serial.println(index);
+}
 
-State::~State(){};
+State::~State(){
+  for (auto t : transitions) {
+    delete t;
+  }
+  // Serial.print("State with index ");
+  // Serial.print(index);
+  // Serial.println(" destroyed");
+}
 
-/*
- * Adds a transition structure to the list of transitions
- * for this state.
- * Params:
- * conditionFunction is the address of a function that will be evaluated
- * to determine if the transition occurs
- * state is the state to transition to
- */
 void State::addTransition(std::function<bool()> conditionFunction, State* s){
   struct Transition* t = new Transition{conditionFunction, s->index};
-  transitions->add(t);
+  transitions.push_back(t);
+  // Serial.print("Added transition to state ");
+  // Serial.println(s->index);
 }
 
-/*
- * Adds a transition structure to the list of transitions
- * for this state.
- * Params:
- * conditionFunction is the address of a function that will be evaluated
- * to determine if the transition occurs
- * stateNumber is the number of the state to transition to
- */
 void State::addTransition(std::function<bool()> conditionFunction, int stateNumber){
   struct Transition* t = new Transition{conditionFunction, stateNumber};
-  transitions->add(t);
+  transitions.push_back(t);
+  // Serial.print("Added transition to state ");
+  // Serial.println(stateNumber);
 }
 
-/*
- * Evals all transitions sequentially until one of them is true.
- * Returns:
- * The stateNumber of the transition that evaluates to true
- * -1 if none evaluate to true ===> Returning index now instead to avoid confusion between first run and no transitions
- */
 int State::evalTransitions(){
-  if(transitions->size() == 0) return index;
-  bool result = false;
-  
-  for(int i=0;i<transitions->size();i++){
-    result = transitions->get(i)->conditionFunction();
-    if(result == true){
-      return transitions->get(i)->stateNumber;
+  // Serial.print("Evaluating transitions for state ");
+  // Serial.println(index);
+  for (auto t : transitions) {
+    // Serial.print("Evaluating transition to state ");
+    // Serial.println(t->stateNumber);
+    if (t->conditionFunction()) {
+      // Serial.print("Transition to state ");
+      // Serial.print(t->stateNumber);
+      // Serial.println(" is true");
+      return t->stateNumber;
     }
   }
-  return index;
+  // Serial.println("No transitions evaluated to true");
+  return -1;
 }
 
-/*
- * Execute runs the stateLogic and then evaluates
- * all available transitions. The transition that
- * returns true is returned.
- */
 int State::execute(){
+  // Serial.print("Executing state logic for state ");
+  // Serial.println(index);
   stateLogic();
   return evalTransitions();
 }
 
-/*
- * Method to dynamically set a transition
- */
-int State::setTransition(int index, int stateNo){
-	if(transitions->size() == 0) return -1;
-	transitions->get(index)->stateNumber = stateNo;
-	return stateNo;
+int State::setTransition(int index, int stateNumber){
+  if (transitions.size() == 0) return -1;
+  auto it = transitions.begin();
+  std::advance(it, index);
+  (*it)->stateNumber = stateNumber;
+  // Serial.print("Set transition at index ");
+  // Serial.print(index);
+  // Serial.print(" to state ");
+  // Serial.println(stateNumber);
+  return stateNumber;
 }

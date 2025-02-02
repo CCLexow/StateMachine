@@ -1,22 +1,21 @@
 #include "StateMachine.h"
+// #include <Arduino.h> // Add this line for Serial
 
 StateMachine::StateMachine(){
-  stateList = new LinkedList<State*>();
-};
+  // No need to initialize stateList as std::list initializes itself
+  // Serial.println("StateMachine created");
+}
 
-StateMachine::~StateMachine(){};
+StateMachine::~StateMachine(){
+  for (auto s : stateList) {
+    delete s;
+  }
+  // Serial.println("StateMachine destroyed");
+}
 
-/*
- * Main execution of the machine occurs here in run
- * The current state is executed and it's transitions are evaluated
- * to determine the next state. 
- * 
- * By design, only one state is executed in one loop() cycle.
- */
 void StateMachine::run(){
-  //Serial.println("StateMachine::run()");
   // Early exit, no states are defined
-  if(stateList->size() == 0) return;
+  if(stateList.size() == 0) return;
 
   // Initial condition
   if(currentState == -1){
@@ -25,55 +24,67 @@ void StateMachine::run(){
   
   // Execute state logic and return transitioned
   // to state number. Remember the current state then check
-  // if it wasnt't changed in state logic. If it was, we 
+  // if it wasn't changed in state logic. If it was, we 
   // should ignore predefined transitions.
   int initialState = currentState;
-  int next = stateList->get(currentState)->execute();
+  auto it = stateList.begin();
+  std::advance(it, currentState);
+  int next = (*it)->execute();
+  
   if(initialState == currentState){
-    executeOnce = (currentState == next)?false:true;
-    currentState = next;
+    if(next == -1){
+      executeOnce = false;
+    } else {
+      executeOnce = true;
+      currentState = next;
+    }
+  } else {
+    executeOnce = true;
   }
+
+  // Serial.print("Current state: ");
+  // Serial.print(currentState);
+  // Serial.print(", Next state: ");
+  // Serial.print(next);
+  // Serial.print(", Execute once: ");
+  // Serial.println(executeOnce);
 }
 
-/*
- * Adds a state to the machine
- * It adds the state in sequential order.
- */
 State* StateMachine::addState(void(*functionPointer)()){
   State* s = new State();
   s->stateLogic = functionPointer;
-  stateList->add(s);
-  s->index = stateList->size()-1;
+  stateList.push_back(s);
+  s->index = stateList.size() - 1;
+  // Serial.print("Added state with index ");
+  // Serial.println(s->index);
   return s;
 }
 
 State* StateMachine::addState(std::function<void(void)> stateFunction) {
   State* s = new State();
   s->stateLogic = [stateFunction]() { stateFunction(); };
-  stateList->add(s);
-  s->index = stateList->size() - 1;
+  stateList.push_back(s);
+  s->index = stateList.size() - 1;
+  // Serial.print("Added state with index ");
+  // Serial.println(s->index);
   return s;
 }
 
-/*
- * Jump to a state
- * given by a pointer to that state.
- */
 State* StateMachine::transitionTo(State* s){
   this->currentState = s->index;
   this->executeOnce = true;
+  // Serial.print("Transitioned to state ");
+  // Serial.println(s->index);
   return s;
 }
 
-/*
- * Jump to a state
- * given by a state index number.
- */
 int StateMachine::transitionTo(int i){
-  if(i < stateList->size()){
-	this->currentState = i;
-	this->executeOnce = true;
-	return i;
+  if(i < static_cast<int>(stateList.size())){
+    this->currentState = i;
+    this->executeOnce = true;
+    // Serial.print("Transitioned to state ");
+    // Serial.println(i);
+    return i;
   }
   return currentState;
 }
